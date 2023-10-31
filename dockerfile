@@ -1,20 +1,16 @@
-# Use an official Node.js runtime as the base image
-FROM node:alpine
-
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the package.json and package-lock.json files to the container
+# step one build
+FROM node:20.9.0 as builder
+LABEL application="tour-list"
+LABEL owner="vikash"
+RUN mkdir /code
+WORKDIR /code
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
-
-# Copy the entire project directory to the container
 COPY . .
-
-# Build the React app
 RUN npm run build
+# CMD ["npm", "start"]
 
-# Set the command to start the app
-CMD ["npm", "start"]
+# step 2
+
+FROM nginx
+COPY --from=builder /code/build/ /usr/share/nginx/html
